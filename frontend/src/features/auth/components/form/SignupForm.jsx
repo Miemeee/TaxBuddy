@@ -21,7 +21,7 @@ function SignupForm({ onOpenTerms, onOpenPrivacy }) {
         togglePassword,
         setAcceptTerms,
         submit,
-    } = useSignupForm(() => navigate("/onboarding"));
+    } = useSignupForm(() => navigate("/"));
 
     return (
         <Box component="form" onSubmit={submit}>

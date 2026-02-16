@@ -2,29 +2,31 @@
 
 const KEYS = {
   PROFILE_COMPLETED: "taxbuddy_profile_completed",
-};
-
-const STORAGE_KEYS = {
-  USERNAME: "taxbuddy_user_name",
+    USERNAME: "taxbuddy_user_name",
 };
 
 export const authStorage = {
+
+  setProfileCompleted(value) {
+    localStorage.setItem(KEYS.PROFILE_COMPLETED, String(value));
+  },
 
   getProfileCompleted() {
     return localStorage.getItem(KEYS.PROFILE_COMPLETED) === "true";
   },
 
-
   saveUsername(username) {
-    localStorage.setItem(STORAGE_KEYS.USERNAME, username);
+    localStorage.setItem(KEYS.USERNAME, username);
   },
 
   getUsername() {
-    return localStorage.getItem(STORAGE_KEYS.USERNAME);
+    return localStorage.getItem(KEYS.USERNAME);
   },
 
-  clearUsername() {
-    localStorage.removeItem(STORAGE_KEYS.USERNAME);
+  clear() {
+    localStorage.removeItem(KEYS.PROFILE_COMPLETED);
+    localStorage.removeItem(KEYS.USERNAME);
   },
+
 
 };
