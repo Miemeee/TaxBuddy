@@ -1,0 +1,47 @@
+{
+  "welcome": {
+    "title": "Welcome to",
+    "subtitle": "Your friendly Thai tax companion",
+    "button": "Get started"
+  },
+  "onboarding": {
+    "title": "Hello {{name}}",
+    "subtitle": "Please tell us a bit about yourself",
+    "incomeLabel": "Your income channels",
+    "incomePlaceholder": "e.g. Tiktok, Youtube, Facebook",
+
+    "q_marital": "Do you have a spouse?",
+    "marital_single": "Single",
+    "marital_married": "Married",
+
+    "q_children": "Do you have children under your care?",
+    "q_parents": "Do you support your parents?",
+    "q_disabled": "Are you a person with disability?",
+
+    "yes": "Yes",
+    "no": "No",
+    "next": "Continue"
+  },
+  "auth": {
+    "signup": {
+      "title": "Create an account",
+      "usernameLabel": "Username",
+      "contactLabel": "Email / Phone number",
+      "passwordLabel": "Password",
+      "termsText": "I accept the {{terms}} and {{privacy}}",
+      "termsLink": "Terms",
+      "privacyLink": "Privacy Policy",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in"
+    },
+    "signin": {
+      "title": "Sign in",
+      "contactLabel": "Email / Phone number",
+      "passwordLabel": "Password",
+      "submit": "Sign in",
+      "noAccount": "Don't have an account?",
+      "signupLink": "Create one"
+    }
+  }
+}
