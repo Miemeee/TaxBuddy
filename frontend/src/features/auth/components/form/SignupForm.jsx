@@ -3,6 +3,7 @@ import { Box, Button, Typography, IconButton, InputAdornment } from "@mui/materi
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useSignupForm } from "../../hooks/useSignUpForm";
 
 import AuthInput from "./AuthInput";
 import AcceptTerms from "../legal/AcceptTerms";
@@ -11,49 +12,41 @@ function SignupForm({ onOpenTerms, onOpenPrivacy }) {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    const [username, setUsername] = useState("");
-    const [contact, setContact] = useState("");
-    const [password, setPassword] = useState("");
-    const [showPass, setShowPass] = useState(false);
-    const [acceptTerms, setAcceptTerms] = useState(false);
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        if (!username || !contact || !password || !acceptTerms) {
-            alert(t("auth.signup.alert"));
-            return;
-        }
-
-        localStorage.setItem("taxbuddy_user_name", username);
-        navigate("/onboarding");
-    };
+    const {
+        form,
+        showPass,
+        acceptTerms,
+        canSubmit,
+        updateField,
+        togglePassword,
+        setAcceptTerms,
+        submit,
+    } = useSignupForm(() => navigate("/onboarding"));
 
     return (
-        <Box component="form" onSubmit={handleSubmit}>
+        <Box component="form" onSubmit={submit}>
+
             <AuthInput
                 placeholder={t("auth.signup.username")}
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={form.username}
+                onChange={updateField("username")}
             />
 
             <AuthInput
                 placeholder={t("auth.signup.contact")}
-                value={contact}
-                onChange={(e) => setContact(e.target.value)}
+                value={form.contact}
+                onChange={updateField("contact")}
             />
 
             <AuthInput
                 placeholder={t("auth.signup.password")}
                 type={showPass ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={form.password}
+                onChange={updateField("password")}
                 endAdornment={
-                    <InputAdornment position="end">
-                        <IconButton onClick={() => setShowPass(!showPass)}>
-                            {showPass ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                    </InputAdornment>
+                    <IconButton onClick={togglePassword}>
+                        {showPass ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
                 }
             />
 
@@ -64,13 +57,9 @@ function SignupForm({ onOpenTerms, onOpenPrivacy }) {
                 onOpenPrivacy={onOpenPrivacy}
             />
 
-            <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                disabled={!acceptTerms}
-                sx={submitBtn}
-            >
+            <Button type="submit" fullWidth
+                variant="contained" disabled={!canSubmit}
+                sx={submitBtn}>
                 {t("auth.signup.submit")}
             </Button>
 
