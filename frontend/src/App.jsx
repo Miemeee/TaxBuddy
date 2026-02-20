@@ -1,11 +1,11 @@
 // src/App.js
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import WelcomePage from "./pages/WelcomePage";
-import OnboardingPage from "./pages/OnBoardingPage";
+import WelcomePage from "./features/welcome/WelcomePage";
+import OnboardingPage from "./features/onboarding/OnBoardingPage";
 import OnboardingDetailsPage from "./pages/OnBoardingDetailsPage"
 import SignupPage from "./features/auth/pages/SignupPage";
 import LoginPage from "./features/auth/pages/LoginPage";
-import DashboardPage from "./pages/DashboardPage";
+import DashboardPage from "./features/dashboard/DashboardPage";
 import IncomePage from "./pages/IncomePage";
 import ExpensePage from "./pages/ExpensePage";
 import SimulationPage from "./pages/SimulationPage";
