@@ -36,7 +36,7 @@ export default function TransactionForm({
     const [openSuccess, setOpenSuccess] = useState(false);
 
     const [amountError, setAmountError] = useState("");
-    const [walletError, setWalletError] = useState(""); // 🔥 เพิ่ม
+    const [walletError, setWalletError] = useState("");
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -76,13 +76,11 @@ export default function TransactionForm({
     }, [initialData]);
 
     const handleSubmit = async () => {
-        // 🔥 validate wallet
         if (!walletType) {
             setWalletError(t("transaction.selectWallet"));
             return;
         }
 
-        // 🔥 validate amount
         if (!amount) {
             setAmountError(t("transaction.amountRequired"));
             return;
@@ -187,7 +185,7 @@ export default function TransactionForm({
                             key={channel}
                             onClick={() => {
                                 setWalletType(channel);
-                                setWalletError(""); // 🔥 clear error
+                                setWalletError("");
                             }}
                             sx={{
                                 minWidth: 110,
@@ -209,7 +207,6 @@ export default function TransactionForm({
                 })}
             </Box>
 
-            {/* 🔥 wallet error */}
             {walletError && (
                 <Typography color="error" fontSize={14} mb={1}>
                     {walletError}
