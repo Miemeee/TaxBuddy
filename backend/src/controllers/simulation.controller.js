@@ -2,9 +2,7 @@ import prisma from "../config/prisma.js";
 import { calculateByBracket } from "../utils/taxBracket.util.js";
 
 
-// -----------------------------
-// ดึงรายการรายได้ (group ตาม wallet)
-// -----------------------------
+// ดึงรายการรายได้ 
 export const getSimulationIncomes = async (req, res) => {
   try {
 
@@ -38,9 +36,7 @@ export const getSimulationIncomes = async (req, res) => {
     });
 
 
-    // -----------------------------
     // group ตาม wallet_type
-    // -----------------------------
     const grouped = {};
 
     incomes.forEach((t) => {
@@ -73,11 +69,7 @@ export const getSimulationIncomes = async (req, res) => {
   }
 };
 
-
-
-// -----------------------------
 // ดึงรายการค่าลดหย่อน
-// -----------------------------
 export const getSimulationDeductions = async (req, res) => {
   try {
 
@@ -108,24 +100,25 @@ export const getSimulationDeductions = async (req, res) => {
       },
     });
 
-
-    // -----------------------------
-    // group ตาม deduction_name
-    // -----------------------------
+    // group ตาม deduction_id
     const grouped = {};
 
     deductions.forEach((d) => {
 
-      const name = d.deduction.deduction_name;
+      const id = d.deduction.deduction_id;
 
-      if (!grouped[name]) {
-        grouped[name] = {
-          deduction_name: name,
+      if (!grouped[id]) {
+        grouped[id] = {
+          deduction_id: id,
           items: [],
         };
       }
 
-      grouped[name].items.push(d);
+      grouped[id].items.push({
+        id: d.user_deduction_id,
+        amount: d.amount_claimed,
+      });
+
     });
 
     res.json({
@@ -141,9 +134,9 @@ export const getSimulationDeductions = async (req, res) => {
       success: false,
       message: "Server error",
     });
+
   }
 };
-
 
 
 export const calculateSimulation = async (req, res) => {
@@ -158,14 +151,14 @@ export const calculateSimulation = async (req, res) => {
       });
     }
 
-    // -----------------------------
     // รายได้ที่เลือก
-    // -----------------------------
+
     const incomes = await prisma.transaction.findMany({
       where: {
         user_id: userId,
         transaction_id: { in: transactionIds },
       },
+      orderBy: { date: "desc" },
     });
 
     const totalIncome = incomes.reduce(
@@ -173,9 +166,8 @@ export const calculateSimulation = async (req, res) => {
       0
     );
 
-    // -----------------------------
-    // หักค่าใช้จ่ายเหมา
-    // -----------------------------
+    // ค่าใช้จ่ายเหมา
+
     const taxExpense = Math.min(totalIncome * 0.5, 100000);
 
     const incomeAfterExpense = Math.max(
@@ -183,32 +175,29 @@ export const calculateSimulation = async (req, res) => {
       0
     );
 
-    // -----------------------------
-    // ค่าลดหย่อนส่วนตัว
-    // -----------------------------
+    // ค่าลดหย่อน
+
     const PERSONAL_ALLOWANCE = 60000;
 
-    // -----------------------------
-    // ดึง deduction ที่เลือก
-    // -----------------------------
-    let deductionTotal = 0;
+    let selectedDeductions = [];
 
     if (deductionIds?.length) {
-      const selectedDeductions =
-        await prisma.userDeduction.findMany({
-          where: {
-            user_id: userId,
-            user_deduction_id: { in: deductionIds },
-          },
-        });
-
-      deductionTotal = selectedDeductions.reduce(
-        (sum, d) => sum + d.amount_claimed,
-        0
-      );
+      selectedDeductions = await prisma.userDeduction.findMany({
+        where: {
+          user_id: userId,
+          user_deduction_id: { in: deductionIds },
+        },
+        include: {
+          deduction: true,
+        },
+      });
     }
 
-    // รวมค่าลดหย่อนทั้งหมด
+    const deductionTotal = selectedDeductions.reduce(
+      (sum, d) => sum + d.amount_claimed,
+      0
+    );
+
     const totalDeduction =
       PERSONAL_ALLOWANCE + deductionTotal;
 
@@ -225,22 +214,34 @@ export const calculateSimulation = async (req, res) => {
       taxableIncome
     );
 
+    // -----------------------------
+    // RESPONSE
+    // -----------------------------
+
     res.json({
       success: true,
+
       summary: {
         totalIncome,
         taxExpense,
         incomeAfterExpense,
-
         personalAllowance: PERSONAL_ALLOWANCE,
         deductionTotal,
         totalDeduction,
-
         taxableIncome,
         taxTotal,
         taxPayable,
       },
+
+      transactions: incomes,
+
+      deductions: selectedDeductions.map((d) => ({
+        id: d.user_deduction_id,
+        name: d.deduction.deduction_name,
+        amount: d.amount_claimed,
+      })),
     });
+
   } catch (err) {
     console.error("Simulation calculate error:", err);
 

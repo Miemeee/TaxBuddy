@@ -6,10 +6,10 @@ export const createRecord = async (userId, year) => {
     throw new Error("Year is required");
   }
 
-  // 1️⃣ คำนวณภาษีก่อน
+  // คำนวณภาษี
   const result = await taxService.calculate(userId, year);
 
-  // 2️⃣ บันทึก snapshot
+  // บันทึก snapshot
   const record = await prisma.taxRecord.create({
     data: {
       user_id: userId,

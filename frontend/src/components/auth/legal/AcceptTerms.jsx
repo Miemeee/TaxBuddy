@@ -21,7 +21,7 @@ function AcceptTerms({
             }
             label={
                 <Typography
-                    lineHeight={1.6}
+                    lineHeight={3}
                     fontSize={13}
                     color="text.secondary"
                 >

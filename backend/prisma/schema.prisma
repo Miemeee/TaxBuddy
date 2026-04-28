@@ -12,7 +12,7 @@ model User {
   name               String
   email              String   @unique
   phone_number       String?
-  password_hash      String
+  password_hash      String?
   incomeChannels     IncomeChannel[]
   allow_notifications Boolean @default(false)
     has_onboarded     Boolean  @default(false)
@@ -33,7 +33,6 @@ model Transaction {
   transaction_id  Int      @id @default(autoincrement())
   user_id         Int
   amount          Float
-  category        String
   description     String?
   document_id     Int?
   date            DateTime

@@ -11,7 +11,7 @@ export const useSignUpForm = (onSuccess) => {
   const [showPass, setShowPass] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(""); 
 
   const updateField = (field) => (e) => {
     setForm((prev) => ({
@@ -37,7 +37,7 @@ export const useSignUpForm = (onSuccess) => {
 
     try {
       setLoading(true);
-      setError(null);
+      setError(""); 
 
       await register({
         name: form.username,
@@ -59,23 +59,21 @@ export const useSignUpForm = (onSuccess) => {
       }
 
       localStorage.setItem("token", token);
-
-      localStorage.setItem(
-        "has_onboarded",
-        String(hasOnboarded)
-      );
+      localStorage.setItem("has_onboarded", String(hasOnboarded));
 
       if (onSuccess) {
         onSuccess(hasOnboarded);
       }
 
-    } catch (err) {
-      console.error(err);
-      setError(
-        err.response?.data?.message ||
-        err.message ||
-        "Sign up failed"
-      );
+} catch (err) {
+      console.log("2. Data from backend:", err.response?.data);
+
+      const errorData = err.response?.data;
+      throw {
+        errorCode: errorData?.errorCode || "UNKNOWN_ERROR",
+        message: errorData?.message || err.message
+      };
+
     } finally {
       setLoading(false);
     }

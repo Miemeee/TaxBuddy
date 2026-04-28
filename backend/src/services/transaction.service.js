@@ -26,7 +26,6 @@ export const create = async (userId, data) => {
 
   if (
     data.amount === undefined ||
-    data.category == null ||
     data.date == null ||
     data.transaction_type == null
   ) {
@@ -43,7 +42,6 @@ export const create = async (userId, data) => {
     data: {
       user_id: userId,
       amount: parsedAmount,
-      category: data.category,
       description: data.description || null,
       date: new Date(data.date),
       transaction_type: data.transaction_type,
@@ -72,7 +70,6 @@ export const update = async (userId, transactionId, data) => {
         data.amount !== undefined
           ? parseFloat(data.amount)
           : existing.amount,
-      category: data.category ?? existing.category,
       description: data.description ?? existing.description,
       date: data.date ? new Date(data.date) : existing.date,
       transaction_type:

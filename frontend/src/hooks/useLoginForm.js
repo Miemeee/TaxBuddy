@@ -12,7 +12,7 @@ export const useLoginForm = (onSuccess) => {
 
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(""); 
 
   const updateField = (field) => (e) => {
     setForm((prev) => ({
@@ -36,7 +36,7 @@ export const useLoginForm = (onSuccess) => {
 
     try {
       setLoading(true);
-      setError(null);
+      setError("");
 
       const response = await login(form);
 
@@ -50,7 +50,9 @@ export const useLoginForm = (onSuccess) => {
       }
 
       localStorage.setItem("token", token);
+
       await fetchUser();
+
       if (onSuccess) {
         onSuccess(hasOnboarded);
       }
@@ -58,11 +60,15 @@ export const useLoginForm = (onSuccess) => {
     } catch (err) {
       console.error("Login error:", err);
 
-      setError(
+      const message =
         err.response?.data?.message ||
         err.message ||
-        "Login failed"
-      );
+        "Login failed";
+
+      setError(message);
+
+      throw new Error(message);
+
     } finally {
       setLoading(false);
     }

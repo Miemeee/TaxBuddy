@@ -1,41 +1,75 @@
 // src/App.js
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import WelcomePage from "./features/welcome/WelcomePage";
-import OnboardingPage from "./features/onboarding/OnBoardingPage";
-import OnboardingDetailsPage from "./pages/OnBoardingDetailsPage"
-import SignupPage from "./features/auth/pages/SignupPage";
-import LoginPage from "./features/auth/pages/LoginPage";
-import DashboardPage from "./features/dashboard/DashboardPage";
-import IncomePage from "./pages/IncomePage";
-import ExpensePage from "./pages/ExpensePage";
-import SimulationPage from "./pages/SimulationPage";
-import SimulationExpensePage from "./pages/SimulationExpensePage";
-import SimulationResultPage from "./pages/SimulationResultPage";
 
-// import CalculatorPage from "./pages/CalculatorPage";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Box } from "@mui/material";
+
+import WelcomePage from "./pages/WelcomePage";
+import OnboardingPage from "./pages/OnBoardingPage";
+import SignupPage from "./pages/SignupPage";
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
+import TransactionPage from "./pages/TransactionPage";
+import SimulationIncomePage from "./pages/simulation/SimulationIncomePage";
+import SimulationDeductionPage from "./pages/simulation/SimulationDeduction";
+import SimulationResultPage from "./pages/simulation/SimulationResultPage";
+import ProfilePage from "./pages/ProfilePage";
+
+import { SimulationProvider } from "./context/SimulationContext";
+import LanguageSwitcher from "./components/common/LanguageSwitcher";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<WelcomePage />} />
-        <Route path="/onboarding" element={<OnboardingPage />} />
-        <Route path="/onboarding-details" element={<OnboardingDetailsPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/income" element={<IncomePage />} />
-        <Route path="/expense" element={<ExpensePage />} />
-        <Route path="/simulation" element={<SimulationPage />} />
-        <Route
-          path="/simulation/expenses"
-          element={<SimulationExpensePage />}
-        />
-        <Route path="/simulation/result" element={<SimulationResultPage />} />
+    <SimulationProvider>
+      <BrowserRouter>
+        <Box
+          sx={{
+            position: "fixed",
+            top: 16,
+            right: 16,
+            zIndex: 9999,
+          }}
+        >
+          <LanguageSwitcher />
+        </Box>
 
-        {/* <Route path="/calculator" element={<CalculatorPage />} /> */}
-      </Routes>
-    </BrowserRouter>
+        <Routes>
+          <Route path="/" element={<WelcomePage />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login" element={<LoginPage />} />
+
+          <Route path="/dashboard" element={<DashboardPage />} />
+
+          <Route
+            path="/income"
+            element={<TransactionPage type="income" />}
+          />
+
+          <Route
+            path="/expense"
+            element={<TransactionPage type="expense" />}
+          />
+
+          <Route
+            path="/simulation/income"
+            element={<SimulationIncomePage />}
+          />
+
+          <Route
+            path="/simulation/deductions"
+            element={<SimulationDeductionPage />}
+          />
+
+          <Route
+            path="/simulation/result"
+            element={<SimulationResultPage />}
+          />
+
+          <Route path="/profile" element={<ProfilePage />} />
+        </Routes>
+
+      </BrowserRouter>
+    </SimulationProvider>
   );
 }
 

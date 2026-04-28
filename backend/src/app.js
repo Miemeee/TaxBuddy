@@ -10,6 +10,7 @@ import errorMiddleware from "./middleware/error.middleware.js";
 import userRoutes from "./routes/user.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import simulationRoutes from "./routes/simulation.routes.js";
+import userProfileRoutes from "./routes/userProfile.routes.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/api/transactions", transactionRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/simulation", simulationRoutes);
+app.use("/api/user-profile", userProfileRoutes);
 
 app.get("/", (req, res) => {
   res.send("TaxBuddy Backend Running");

@@ -1,16 +1,25 @@
 import React, { useState } from "react";
-import { Box, Button, Typography, IconButton, InputAdornment } from "@mui/material";
+import {
+    Box,
+    Button,
+    Typography,
+    IconButton,
+} from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useSignUpForm } from "../../../hooks/useSignUpForm";
 
+import { useSignUpForm } from "../../../hooks/useSignUpForm";
 import AuthInput from "./AuthInput";
 import AcceptTerms from "../legal/AcceptTerms";
 
 function SignUpForm({ onOpenTerms, onOpenPrivacy }) {
     const { t } = useTranslation();
     const navigate = useNavigate();
+
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [showConfirmPass, setShowConfirmPass] = useState(false);
+    const [apiError, setApiError] = useState("");
 
     const {
         form,
@@ -23,9 +32,32 @@ function SignUpForm({ onOpenTerms, onOpenPrivacy }) {
         submit,
     } = useSignUpForm(() => navigate("/"));
 
-    return (
-        <Box component="form" onSubmit={submit}>
+    const passwordMatch = form.password === confirmPassword;
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            setApiError("");
+            await submit(e);
+        } catch (err) {
+            console.log("3. Received in Form:", err);
+            const code = err.errorCode;
+            console.log("4. Final Code:", code);
+
+            const translationPath = `auth.errors.${code}`;
+            const translated = t(translationPath);
+
+            if (translated !== translationPath) {
+                setApiError(translated);
+            } else {
+                setApiError(code);
+            }
+        }
+    };
+
+
+    return (
+        <Box component="form" onSubmit={handleSubmit}>
             <AuthInput
                 placeholder={t("auth.signup.username")}
                 value={form.username}
@@ -36,6 +68,8 @@ function SignUpForm({ onOpenTerms, onOpenPrivacy }) {
                 placeholder={t("auth.signup.contact")}
                 value={form.contact}
                 onChange={updateField("contact")}
+                error={!!apiError}
+                helperText={apiError}
             />
 
             <AuthInput
@@ -50,6 +84,24 @@ function SignUpForm({ onOpenTerms, onOpenPrivacy }) {
                 }
             />
 
+            <AuthInput
+                placeholder={t("auth.signup.confirmPassword")}
+                type={showConfirmPass ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                error={confirmPassword && !passwordMatch}
+                helperText={
+                    confirmPassword && !passwordMatch
+                        ? t("auth.signup.passwordNotMatch")
+                        : ""
+                }
+                endAdornment={
+                    <IconButton onClick={() => setShowConfirmPass(!showConfirmPass)}>
+                        {showConfirmPass ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                }
+            />
+
             <AcceptTerms
                 checked={acceptTerms}
                 onChange={setAcceptTerms}
@@ -57,9 +109,13 @@ function SignUpForm({ onOpenTerms, onOpenPrivacy }) {
                 onOpenPrivacy={onOpenPrivacy}
             />
 
-            <Button type="submit" fullWidth
-                variant="contained" disabled={!canSubmit}
-                sx={submitBtn}>
+            <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                disabled={!canSubmit || !passwordMatch}
+                sx={submitBtn}
+            >
                 {t("auth.signup.submit")}
             </Button>
 
@@ -83,10 +139,8 @@ const submitBtn = {
     fontSize: 16,
     fontWeight: 600,
     bgcolor: "primary.main",
-
     boxShadow: (theme) =>
         `0px 10px 20px ${theme.palette.primary.main}55`,
-
     "&:hover": {
         bgcolor: "primary.dark",
     },

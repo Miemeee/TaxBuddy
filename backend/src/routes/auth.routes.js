@@ -6,7 +6,13 @@ import { registerSchema } from "../validators/auth.validator.js";
 
 const router = express.Router();
 
-router.post("/register", validate(registerSchema), controller.register);
+router.post(
+  "/register",
+  validate(registerSchema),
+  controller.register
+);
+
 router.post("/login", controller.login);
+router.post("/google", controller.googleLogin);
 
 export default router;

@@ -29,3 +29,18 @@ export const login = async (req, res, next) => {
     next(err);
   }
 };
+
+export const googleLogin = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+
+    const result = await authService.googleLogin(token);
+
+    res.json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
