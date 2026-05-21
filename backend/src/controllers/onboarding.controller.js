@@ -1,12 +1,18 @@
 import prisma from "../config/prisma.js";
 import { generateDeductions } from "../services/deductionEngine.service.js";
 
+/**
+ * @route POST /onboarding
+ * @body { incomeChannel: Array, maritalStatus, hasChildren, supportsParents, isDisabled }
+ * @returns {Object} Success message
+ */
 export const handleOnboarding = async (req, res) => {
   try {
     const userId = req.user.id;
     const profile = req.body;
     const year = new Date().getFullYear();
 
+    //Update user income channel
     await prisma.user.update({
       where: { user_id: userId },
       data: {
@@ -14,6 +20,7 @@ export const handleOnboarding = async (req, res) => {
       },
     });
 
+    // Remove deduction
     await prisma.userDeduction.deleteMany({
       where: {
         user_id: userId,

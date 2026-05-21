@@ -70,7 +70,7 @@ export const useSignUpForm = (onSuccess) => {
 
       const errorData = err.response?.data;
       throw {
-        errorCode: errorData?.errorCode || "UNKNOWN_ERROR",
+        errorCode: errorData?.errorCode || "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
         message: errorData?.message || err.message
       };
 

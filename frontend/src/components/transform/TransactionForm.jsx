@@ -8,11 +8,17 @@ import {
     Box,
     Snackbar,
     Alert,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@mui/material/styles";
 import axios from "../../api/axios";
 import { transactionService } from "../../services/transactionService";
+
+const backendOrigin = axios.defaults.baseURL?.replace(/\/api$/, "") || "";
 
 export default function TransactionForm({
     type = "income",
@@ -27,11 +33,15 @@ export default function TransactionForm({
     const isIncome = type === "income";
 
     const [walletType, setWalletType] = useState("");
+    const [customWalletType, setCustomWalletType] = useState("");
     const [date, setDate] = useState("");
     const [time, setTime] = useState("");
     const [amount, setAmount] = useState("");
     const [detail, setDetail] = useState("");
     const [file, setFile] = useState(null);
+    const [savedFile, setSavedFile] = useState(null);
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState("");
     const [incomeChannels, setIncomeChannels] = useState([]);
     const [openSuccess, setOpenSuccess] = useState(false);
 
@@ -62,21 +72,28 @@ export default function TransactionForm({
     useEffect(() => {
         if (initialData) {
             const d = new Date(initialData.date);
+            const wallet = initialData.wallet_type || "";
 
-            setWalletType(initialData.wallet_type || "");
+            setWalletType(wallet);
+            setCustomWalletType(wallet && !incomeChannels.includes(wallet) ? wallet : "");
             setDate(d.toISOString().split("T")[0]);
             setTime(d.toTimeString().slice(0, 5));
             setAmount(Math.abs(initialData.amount || ""));
             setDetail(initialData.description || "");
+            setSavedFile(initialData.document?.file_path || null);
         } else {
             const now = new Date();
             setDate(now.toISOString().split("T")[0]);
             setTime(now.toTimeString().slice(0, 5));
+            setSavedFile(null);
         }
-    }, [initialData]);
+    }, [initialData, incomeChannels]);
 
     const handleSubmit = async () => {
-        if (!walletType) {
+        const selectedWalletType =
+            walletType === "other" ? customWalletType.trim() : walletType;
+
+        if (!selectedWalletType) {
             setWalletError(t("transaction.selectWallet"));
             return;
         }
@@ -91,28 +108,36 @@ export default function TransactionForm({
             return;
         }
 
-        // clear errors
         setWalletError("");
         setAmountError("");
 
         try {
             const combinedDate = new Date(`${date}T${time || "00:00"}`);
 
-            const payload = {
-                amount: Number(amount),
-                description: detail,
-                date: combinedDate,
-                transaction_type: type,
-                wallet_type: walletType,
-            };
+            const payload = new FormData();
+            payload.append("amount", Number(amount).toString());
+            payload.append("description", detail);
+            payload.append("date", combinedDate.toISOString());
+            payload.append("transaction_type", type);
+            payload.append("wallet_type", selectedWalletType);
+            if (file) {
+                payload.append("file", file);
+            }
 
             if (isEdit && transactionId) {
-                await transactionService.update(transactionId, payload);
+                await transactionService.update(transactionId, {
+                    amount: Number(amount),
+                    description: detail,
+                    date: combinedDate,
+                    transaction_type: type,
+                    wallet_type: selectedWalletType,
+                });
                 onSuccess?.();
                 return;
             }
 
-            await transactionService.create(payload);
+            const created = await transactionService.create(payload);
+            setSavedFile(created.document?.file_path || null);
 
             setOpenSuccess(true);
             setAmount("");
@@ -132,6 +157,25 @@ export default function TransactionForm({
             bgcolor: theme.palette.grey[100],
             "& fieldset": { border: "none" },
         },
+    };
+
+    const isImageFile = (url) => {
+        return /\.(jpg|jpeg|png|gif|bmp|webp|avif|svg)$/i.test(url);
+    };
+
+    const handleOpenPreview = (url) => {
+        if (!isImageFile(url)) {
+            window.open(url, "_blank", "noreferrer");
+            return;
+        }
+
+        setPreviewUrl(url);
+        setPreviewOpen(true);
+    };
+
+    const handleClosePreview = () => {
+        setPreviewOpen(false);
+        setPreviewUrl("");
     };
 
     const FormContent = (
@@ -185,6 +229,7 @@ export default function TransactionForm({
                             key={channel}
                             onClick={() => {
                                 setWalletType(channel);
+                                setCustomWalletType("");
                                 setWalletError("");
                             }}
                             sx={{
@@ -205,7 +250,46 @@ export default function TransactionForm({
                         </Button>
                     );
                 })}
+                <Button
+                    key="other"
+                    onClick={() => {
+                        setWalletType("other");
+                        setWalletError("");
+                    }}
+                    sx={{
+                        minWidth: 110,
+                        height: 44,
+                        borderRadius: 3,
+                        textTransform: "none",
+                        fontWeight: 500,
+                        bgcolor:
+                            walletType === "other"
+                                ? theme.palette.primary.main
+                                : theme.palette.grey[200],
+                        color:
+                            walletType === "other"
+                                ? theme.palette.primary.contrastText
+                                : theme.palette.text.secondary,
+                    }}
+                >
+                    {t("transaction.otherChannel")}
+                </Button>
             </Box>
+
+            {walletType === "other" && (
+                <TextField
+                    fullWidth
+                    value={customWalletType}
+                    placeholder={t("transaction.otherChannelPlaceholder")}
+                    onChange={(e) => {
+                        setCustomWalletType(e.target.value);
+                        if (e.target.value.trim()) {
+                            setWalletError("");
+                        }
+                    }}
+                    sx={{ ...inputSx, mb: 2 }}
+                />
+            )}
 
             {walletError && (
                 <Typography color="error" fontSize={14} mb={1}>
@@ -245,6 +329,68 @@ export default function TransactionForm({
                 onChange={(e) => setDetail(e.target.value)}
                 sx={{ ...inputSx, mb: 2 }}
             />
+
+            <Typography variant="body2" mb={1}>
+                {t("transaction.attachFile")}
+            </Typography>
+
+            <Button
+                variant="outlined"
+                component="label"
+                fullWidth
+                sx={{
+                    borderRadius: 3,
+                    height: 44,
+                    justifyContent: "space-between",
+                    textTransform: "none",
+                    mb: 1,
+                }}
+            >
+                {file ? file.name : t("transaction.chooseFile")}
+                <input
+                    type="file"
+                    hidden
+                    onChange={(e) => {
+                        const selected = e.target.files?.[0] || null;
+                        setFile(selected);
+                    }}
+                />
+            </Button>
+
+            {(savedFile || file) && (
+                <Typography fontSize={14} mb={2}>
+                    {t("transaction.currentFile")}:
+                    {savedFile ? (
+                        <Typography
+                            component="span"
+                            onClick={() => handleOpenPreview(`${backendOrigin}${savedFile}`)}
+                            sx={{
+                                color: theme.palette.primary.main,
+                                cursor: "pointer",
+                                marginLeft: 1,
+                                display: "inline-block",
+                            }}
+                        >
+                            {savedFile.split("/").pop()}
+                        </Typography>
+                    ) : (
+                        <span style={{ marginLeft: 4 }}>{file.name}</span>
+                    )}
+                </Typography>
+            )}
+
+            <Dialog open={previewOpen} onClose={handleClosePreview} maxWidth="md" fullWidth>
+                <DialogContent sx={{ display: "flex", justifyContent: "center" }}>
+                    <img
+                        src={previewUrl}
+                        alt={t("transaction.previewImage")}
+                        style={{ width: "100%", maxHeight: "80vh", objectFit: "contain" }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClosePreview}>{t("transaction.close")}</Button>
+                </DialogActions>
+            </Dialog>
 
             <Button
                 fullWidth

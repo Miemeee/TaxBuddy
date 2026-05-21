@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
 import { simulationService } from "../services/simulationService";
 
+/**
+ * Fetches incomes
+ * @param {Number} year - Tax year
+ * @returns {Object} { groups, selectedIds, toggleSelect, loading, error }
+ */
 export function useSimulation(year) {
-  const [groups, setGroups] = useState([]);
-  const [selectedIds, setSelectedIds] = useState([]);
+  const [groups, setGroups] = useState([]);        // Grouped income data
+  const [selectedIds, setSelectedIds] = useState([]); // Selected income ID
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Fetch incomes whenever year changes
   useEffect(() => {
     if (!year) return;
 
@@ -15,8 +21,10 @@ export function useSimulation(year) {
       try {
         setLoading(true);
 
+        // Fetch income data from API
         const data = await simulationService.getIncomes(year);
 
+        // Transform raw data
         const mapped = data.map((t) => ({
           id: t.transaction_id,
           title: t.description || t.wallet_type || "รายได้",
@@ -25,7 +33,7 @@ export function useSimulation(year) {
           type: t.wallet_type || "other",
         }));
 
-        // 🔥 group by type
+        // Group incomes
         const groupMap = {};
 
         mapped.forEach((item) => {
@@ -35,6 +43,7 @@ export function useSimulation(year) {
           groupMap[item.type].push(item);
         });
 
+        // Convert grouped map
         const grouped = Object.keys(groupMap).map((type) => ({
           type,
           items: groupMap[type],
@@ -46,7 +55,7 @@ export function useSimulation(year) {
 
         setGroups(grouped);
 
-        // default select all
+        // select all incomes
         setSelectedIds(mapped.map((i) => i.id));
 
       } catch (err) {
@@ -60,6 +69,10 @@ export function useSimulation(year) {
     load();
   }, [year]);
 
+  /**
+   * Toggle income selection
+   * @param {Number} id - Income ID
+   */
   const toggleSelect = (id) => {
     setSelectedIds((prev) =>
       prev.includes(id)
@@ -69,10 +82,10 @@ export function useSimulation(year) {
   };
 
   return {
-    groups,
-    selectedIds,
-    toggleSelect,
-    loading,
-    error,
+    groups,          
+    selectedIds,    
+    toggleSelect,  
+    loading,        
+    error,         
   };
 }

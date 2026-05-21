@@ -1,7 +1,12 @@
+/**
+ * @param {Object} profile - User profile
+ * @param {Number} year - Tax year
+ * @returns {Array} Array of available deduction
+ */
 export const generateDeductions = (profile, year) => {
   const deductions = [];
 
-  // คู่สมรส
+  // spouse 60,000  if married
   if (profile.maritalStatus === "married") {
     deductions.push({
       deduction_id: 1,
@@ -10,7 +15,7 @@ export const generateDeductions = (profile, year) => {
     });
   }
 
-  // บุตร
+  // children: 30,000 per child
   if (profile.hasChildren === "yes") {
     deductions.push({
       deduction_id: 2,
@@ -19,7 +24,7 @@ export const generateDeductions = (profile, year) => {
     });
   }
 
-  // พ่อแม่
+  // parents 30,000 
   if (profile.supportsParents === "yes") {
     deductions.push({
       deduction_id: 3,
@@ -28,7 +33,7 @@ export const generateDeductions = (profile, year) => {
     });
   }
 
-  // ผู้พิการ
+  // disabled person 60,000 
   if (profile.isDisabled === "yes") {
     deductions.push({
       deduction_id: 4,

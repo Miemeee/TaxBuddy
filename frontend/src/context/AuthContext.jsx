@@ -1,20 +1,25 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getMe } from "../services/authService";
+import { getMe, logout as logoutService } from "../services/authService";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);           
+    const [loading, setLoading] = useState(true);      
 
+    /**
+     * Fetch user w/ JWT
+     */
     const fetchUser = async () => {
         try {
+            // Check JWT 
             const token = localStorage.getItem("token");
             if (!token) {
                 setUser(null);
                 return;
             }
 
+            // Fetch user
             const response = await getMe();
 
             const payload = response.data?.data || response.data;
@@ -30,6 +35,7 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const init = async () => {
+            // Restore user
             await fetchUser();
             setLoading(false);
         };
@@ -37,18 +43,24 @@ export const AuthProvider = ({ children }) => {
         init();
     }, []);
 
-    const logout = () => {
+    const logout = async () => {
+        try {
+            await logoutService();
+        } catch (err) {
+            console.warn("Logout request failed:", err);
+        }
+
         localStorage.removeItem("token");
         setUser(null);
     };
 
     const value = {
-        user,
-        setUser,
-        fetchUser,
-        loading,
-        logout,
-        isAuthenticated: !!user,
+        user,                                 
+        setUser,                         
+        fetchUser,                    
+        loading,                         
+        logout,                           
+        isAuthenticated: !!user,         
     };
 
     return (
@@ -58,4 +70,8 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
+/**
+ * @throws {Error} If used outside AuthProvider
+ * @returns {Object} Auth context value
+ */
 export const useAuth = () => useContext(AuthContext);

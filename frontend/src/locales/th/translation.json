@@ -95,6 +95,7 @@
       "alert": "กรุณากรอกอีเมลและรหัสผ่าน",
       "google": "เข้าสู่ระบบด้วย Google"
     },
+    "logout": "ออกจากระบบ",
     "errors": {
       "EMAIL_ALREADY_EXISTS": "อีเมลนี้ถูกใช้งานแล้ว",
       "INVALID_CREDENTIALS": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
@@ -210,6 +211,13 @@
     "time": "เวลา",
     "wallet": "ช่องทาง",
     "description": "รายละเอียดเพิ่มเติม",
+    "attachFile": "แนบไฟล์",
+    "chooseFile": "เลือกไฟล์",
+    "otherChannel": "อื่นๆ",
+    "otherChannelPlaceholder": "กรอกช่องทางอื่น",
+    "currentFile": "ไฟล์ที่แนบ",
+    "previewImage": "ดูภาพตัวอย่าง",
+    "close": "ปิด",
     "historyTitle": "ประวัติรายการธุรกรรม",
     "filterAll": "ทั้งหมด",
     "selectWallet": "กรุณาเลือกช่องทาง",

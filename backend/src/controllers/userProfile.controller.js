@@ -3,23 +3,25 @@
 import prisma from "../config/prisma.js";
 
 /**
- * GET PROFILE
+ * @route GET /profile
+ * @returns {Object} User profile with all related data
  */
 export const getProfile = async (req, res) => {
   try {
 
     const userId = req.user.user_id;
 
+    // Fetch user
     const user = await prisma.user.findUnique({
       where: { user_id: userId },
       include: {
-
+        // Get income channels
         incomeChannels: {
           select: {
             channel: true
           }
         },
-
+        // Get deductions
         userDeductions: {
           include: {
             deduction: {
@@ -34,14 +36,13 @@ export const getProfile = async (req, res) => {
       }
     });
 
+    // Format response data
     const response = {
       user_id: user.user_id,
       name: user.name,
       email: user.email,
       has_onboarded: user.has_onboarded,
-
       incomeChannels: user.incomeChannels.map(c => c.channel),
-
       userDeductions: user.userDeductions
     };
 
@@ -62,7 +63,10 @@ export const getProfile = async (req, res) => {
 };
 
 /**
- * UPDATE PROFILE
+ * Update user profile (name, phone)
+ * @route PUT /profile
+ * @body { name, phone_number }
+ * @returns {Object} Updated user data
  */
 export const updateProfile = async (req, res) => {
   try {
@@ -70,6 +74,7 @@ export const updateProfile = async (req, res) => {
     const userId = req.user.user_id;
     const { name, phone_number } = req.body;
 
+    // Update user in db
     const user = await prisma.user.update({
       where: { user_id: userId },
       data: {
@@ -102,7 +107,10 @@ export const updateProfile = async (req, res) => {
 
 
 /**
- * UPDATE INCOME CHANNELS
+ * Update user's income channels
+ * @route PUT /profile/income-channels
+ * @body { channels: ["channel1", "channel2"] }
+ * @returns {Object} Success message
  */
 export const updateIncomeChannels = async (req, res) => {
   try {

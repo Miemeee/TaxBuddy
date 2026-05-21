@@ -5,6 +5,7 @@ export const getByYear = async (req, res, next) => {
     const { year } = req.query;
     const userId = req.user.user_id;
 
+    // Fetch deductions
     const data = await service.getByYear(userId, year);
 
     res.json({
@@ -16,6 +17,11 @@ export const getByYear = async (req, res, next) => {
   }
 };
 
+/**
+ * @route POST /user-deductions
+ * @body { deduction_id, amount_claimed, tax_year }
+ * @returns {Object} Created deduction claim
+ */
 export const create = async (req, res, next) => {
   try {
     const userId = req.user.user_id;  

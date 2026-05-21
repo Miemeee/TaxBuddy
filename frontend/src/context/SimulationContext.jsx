@@ -4,19 +4,24 @@ const SimulationContext = createContext();
 
 export const SimulationProvider = ({ children }) => {
 
-    const [selectedIncomeIds, setSelectedIncomeIds] = useState([]);
+    const [selectedIncomeIds, setSelectedIncomeIds] = useState([]);     
     const [selectedDeductionIds, setSelectedDeductionIds] = useState([]);
 
-    // toggle income
+    /**
+     * @param {Number} id - Income ID to toggle
+     */
     const toggleIncome = (id) => {
         setSelectedIncomeIds((prev) =>
+            // If already selected remove otherwise add 
             prev.includes(id)
                 ? prev.filter((x) => x !== id)
                 : [...prev, id]
         );
     };
 
-    // toggle deduction
+    /**
+     * @param {Number} id - Deduction ID to toggle
+     */
     const toggleDeduction = (id) => {
         setSelectedDeductionIds((prev) =>
             prev.includes(id)
@@ -26,13 +31,13 @@ export const SimulationProvider = ({ children }) => {
     };
 
     const value = {
-        selectedIncomeIds,
-        setSelectedIncomeIds,
-        toggleIncome,
+        selectedIncomeIds,        
+        setSelectedIncomeIds,          
+        toggleIncome,                
 
-        selectedDeductionIds,
-        setSelectedDeductionIds,
-        toggleDeduction,
+        selectedDeductionIds,      
+        setSelectedDeductionIds,     
+        toggleDeduction,             
     };
 
     return (
@@ -42,6 +47,10 @@ export const SimulationProvider = ({ children }) => {
     );
 };
 
+/**
+ * @throws {Error} If used outside SimulationProvider
+ * @returns {Object} Simulation context value
+ */
 export const useSimulationContext = () => {
     const context = useContext(SimulationContext);
 

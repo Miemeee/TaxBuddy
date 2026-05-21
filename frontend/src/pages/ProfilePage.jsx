@@ -1,11 +1,10 @@
-// pages/ProfilePage.jsx
-
 import { Container, Stack, Typography, Button, Box } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import useProfile from "../hooks/useProfile";
+import { useAuth } from "../context/AuthContext.jsx";
 
 import ProfileInfoCard from "../components/profile/ProfileInfoCard";
 import IncomeChannelsCard from "../components/profile/IncomeChanelCard";
@@ -14,6 +13,7 @@ import DeductionsCard from "../components/profile/DeductionCard";
 export default function ProfilePage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { logout } = useAuth();
 
     const {
         profile,
@@ -35,11 +35,30 @@ export default function ProfilePage() {
 
     return (
         <>
-            <Box sx={{ width: "100%", p: 2 }}>
+            <Box
+                sx={{
+                    width: "100%",
+                    p: 2,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: 1,
+                }}
+            >
                 <Button
                     startIcon={<ArrowBackIcon />}
                     onClick={() => navigate(-1)}
                 >
+                </Button>
+                <Button
+                 sx={{ mt : 7 }}
+                    color="error"
+                    variant="contained"
+                    onClick={async () => {
+                        await logout();
+                        navigate("/login");
+                    }}
+                >
+                    {t("auth.logout") || "Logout"}
                 </Button>
             </Box>
             <Container maxWidth="sm">

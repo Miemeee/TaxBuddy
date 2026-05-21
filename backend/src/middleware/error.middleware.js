@@ -1,3 +1,4 @@
+
 export default function errorMiddleware(err, req, res, next) {
   console.error("DEBUG ERROR:", err.message);
 
@@ -5,11 +6,11 @@ export default function errorMiddleware(err, req, res, next) {
   let errorCode = err.message || "INTERNAL_SERVER_ERROR";
 
   if (errorCode === "EMAIL_ALREADY_EXISTS") {
-    statusCode = 409; 
+    statusCode = 409; // Conflict resource already exists
   } else if (errorCode === "INVALID_CREDENTIALS") {
-    statusCode = 401; 
+    statusCode = 401; // Unauthorized authentication failed
   } else if (errorCode === "NOT_FOUND") {
-    statusCode = 404;
+    statusCode = 404; // Not found
   }
 
   res.status(statusCode).json({

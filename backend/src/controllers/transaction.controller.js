@@ -5,6 +5,7 @@ export const getByYear = async (req, res, next) => {
     const { year } = req.query;
     const userId = req.user.user_id;
 
+    // Fetch transactions 
     const data = await service.getByYear(userId, year);
 
     res.json({ success: true, data });
@@ -13,11 +14,22 @@ export const getByYear = async (req, res, next) => {
   }
 };
 
+/**
+ * Create a new transaction (income or expense)
+ * @route POST /transactions
+ * @body { amount, type, date, description, wallet_type }
+ * @returns {Object} Created transaction
+ */
 export const create = async (req, res, next) => {
   try {
     const userId = req.user.user_id;
+    const payload = { ...req.body };
 
-    const result = await service.create(userId, req.body);
+    if (req.file) {
+      payload.file = req.file;
+    }
+
+    const result = await service.create(userId, payload);
 
     res.status(201).json({ success: true, data: result });
   } catch (err) {
@@ -25,6 +37,11 @@ export const create = async (req, res, next) => {
   }
 };
 
+/**
+ * Update an existing transaction
+ * @route PUT /transactions/:id
+ * @returns {Object} Updated transaction
+ */
 export const update = async (req, res, next) => {
   try {
     const userId = req.user.user_id;
@@ -38,6 +55,11 @@ export const update = async (req, res, next) => {
   }
 };
 
+/**
+ * Delete a transaction
+ * @route DELETE /transactions/:id
+ * @returns {Object} Deleted transaction
+ */
 export const remove = async (req, res, next) => {
   try {
     const userId = req.user.user_id;

@@ -95,6 +95,7 @@
       "alert": "Please enter your email and password",
       "google": "Continue with Google"
     },
+    "logout": "Logout",
     "errors": {
       "EMAIL_ALREADY_EXISTS": "This email is already in use",
       "INVALID_CREDENTIALS": "Invalid email or password",
@@ -214,6 +215,13 @@
     "selectWallet": "Please select a channel",
     "amountRequired": "Please enter amount",
     "amountPositive": "Amount must be greater than 0",
+    "otherChannel": "Other",
+    "otherChannelPlaceholder": "Enter other channel",
+    "attachFile": "Attach file",
+    "chooseFile": "Choose file",
+    "currentFile": "Attached file",
+    "previewImage": "Preview image",
+    "close": "Close",
     "saveincome": "Save Income",
     "saveexpense": "Save Expense",
     "saveSuccess": "Transaction saved successfully"

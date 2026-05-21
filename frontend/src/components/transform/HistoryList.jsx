@@ -8,15 +8,25 @@ import {
     Button,
     Select,
     MenuItem,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
 } from "@mui/material";
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "@mui/material/styles";
+import axios from "../../api/axios";
 import EditTransactionModal from "./EditTransactionModal";
 
 export default function HistoryList({ items = [], type, onUpdated }) {
     const { t } = useTranslation();
+    const theme = useTheme();
     const [filter, setFilter] = useState("all");
     const [editingItem, setEditingItem] = useState(null);
+    const backendOrigin = axios.defaults.baseURL?.replace(/\/api$/, "") || "";
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState("");
 
     const isIncome = type === "income";
 
@@ -41,6 +51,25 @@ export default function HistoryList({ items = [], type, onUpdated }) {
 
     const formatDate = (date) => {
         return new Date(date).toLocaleDateString("th-TH");
+    };
+
+    const isImageFile = (url) => {
+        return /\.(jpg|jpeg|png|gif|bmp|webp|avif|svg)$/i.test(url);
+    };
+
+    const handleOpenPreview = (url) => {
+        if (!isImageFile(url)) {
+            window.open(url, "_blank", "noreferrer");
+            return;
+        }
+
+        setPreviewUrl(url);
+        setPreviewOpen(true);
+    };
+
+    const handleClosePreview = () => {
+        setPreviewOpen(false);
+        setPreviewUrl("");
     };
 
     return (
@@ -97,6 +126,21 @@ export default function HistoryList({ items = [], type, onUpdated }) {
                                 >
                                     {formatDate(item.date)}
                                 </Typography>
+                                {item.document?.file_path && (
+                                    <Typography fontSize={14} color="text.secondary">
+                                        <Typography
+                                            component="span"
+                                            onClick={() => handleOpenPreview(`${backendOrigin}${item.document.file_path}`)}
+                                            sx={{
+                                                color: theme.palette.primary.main,
+                                                cursor: "pointer",
+                                                textDecoration: "underline",
+                                            }}
+                                        >
+                                            {item.document.file_path.split("/").pop()}
+                                        </Typography>
+                                    </Typography>
+                                )}
                             </Box>
 
                             {/* Right */}
@@ -137,6 +181,19 @@ export default function HistoryList({ items = [], type, onUpdated }) {
                     </Box>
                 ))}
             </Card>
+
+            <Dialog open={previewOpen} onClose={handleClosePreview} maxWidth="md" fullWidth>
+                <DialogContent sx={{ display: "flex", justifyContent: "center" }}>
+                    <img
+                        src={previewUrl}
+                        alt={t("transaction.previewImage")}
+                        style={{ width: "100%", maxHeight: "80vh", objectFit: "contain" }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClosePreview}>{t("transaction.close")}</Button>
+                </DialogActions>
+            </Dialog>
 
             {/* ===== Edit Modal ===== */}
             <EditTransactionModal
