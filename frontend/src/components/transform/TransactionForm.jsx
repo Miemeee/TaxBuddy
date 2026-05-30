@@ -308,7 +308,7 @@ export default function TransactionForm({
                 error={Boolean(amountError)}
                 helperText={amountError}
                 onChange={(e) => {
-                    const value = e.target.value.replace(/[^0-9]/g, "");
+                    const value = e.target.value.replace(/[^0-9.]/g, "");
                     setAmount(value);
 
                     if (value) {
@@ -380,6 +380,7 @@ export default function TransactionForm({
             )}
 
             <Dialog open={previewOpen} onClose={handleClosePreview} maxWidth="md" fullWidth>
+
                 <DialogContent sx={{ display: "flex", justifyContent: "center" }}>
                     <img
                         src={previewUrl}

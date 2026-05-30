@@ -214,9 +214,7 @@ export const calculateSimulation = async (req, res) => {
       taxableIncome
     );
 
-    // -----------------------------
     // RESPONSE
-    // -----------------------------
 
     res.json({
       success: true,

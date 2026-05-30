@@ -16,7 +16,7 @@
   "onboarding": {
     "title": "สวัสดี {{name}}",
     "subtitle": "โปรดแจ้งข้อมูลส่วนตัวของคุณให้เรา",
-    "incomechannels": "กรอกช่องทางรายได้ของคุณ เช่น Tiktok, Youtube, Facebook",
+    "incomechannels": "กรอกช่องทางรายได้ของคุณ เช่น Tiktok, Youtube, Freelance, เงินเดือน ฯลฯ",
     "incomePlaceholder": "กรอกช่องทางรายได้ของคุณ",
     "addincomechannel": "มีช่องทางรายได้อื่นหรือไม่?",
     "q_marital": "คุณมีคู่สมรสหรือไม่? (หากมี กรุณาตอบคำถามเพิ่มเติม)",

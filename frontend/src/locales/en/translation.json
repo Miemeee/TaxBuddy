@@ -16,7 +16,7 @@
   "onboarding": {
     "title": "Hello {{name}}",
     "subtitle": "Please provide your personal information",
-    "incomechannels": "Enter your income sources such as TikTok, YouTube, Facebook",
+    "incomechannels": "Enter your income sources such as TikTok, YouTube, Freelance, Salary, etc.",
     "incomePlaceholder": "Enter your income sources",
     "addincomechannel": "Do you have additional income sources?",
     "q_marital": "Do you have a spouse? (If yes, please answer additional questions)",
